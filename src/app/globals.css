@@ -1,0 +1,80 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+html,
+body {
+  background-color: #fdfcf7; /* ivory-50 */
+  color: #1f2421; /* charcoal-900 */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Visible keyboard focus */
+:focus-visible {
+  outline: 2px solid #1e6e51; /* green-700 */
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Form fields */
+.field-input {
+  @apply w-full rounded-md border border-charcoal-200 bg-white px-3 py-2 text-base text-charcoal-900 placeholder:text-charcoal-400 focus:border-green-700 focus:outline-none focus:ring-2 focus:ring-green-200;
+}
+
+.field-input[aria-invalid="true"] {
+  @apply border-red-600 focus:border-red-600 focus:ring-red-100;
+}
+
+.field-label {
+  @apply mb-1 block text-sm font-medium text-charcoal-700;
+}
+
+.field-error {
+  @apply mt-1 text-sm text-red-600;
+}
+
+.field-hint {
+  @apply mt-1 text-xs text-charcoal-500;
+}
+
+/* Buttons */
+.btn-primary {
+  @apply inline-flex items-center justify-center rounded-md bg-green-800 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-green-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-700 disabled:cursor-not-allowed disabled:opacity-60;
+}
+
+.btn-secondary {
+  @apply inline-flex items-center justify-center rounded-md border border-charcoal-200 bg-white px-4 py-2.5 text-sm font-semibold text-charcoal-900 transition hover:bg-ivory-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-700;
+}
+
+.btn-ghost {
+  @apply inline-flex items-center justify-center rounded-md px-3 py-1.5 text-sm font-medium text-charcoal-700 transition hover:bg-ivory-100;
+}
+
+/* Status badges */
+.badge {
+  @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium;
+}
+.badge-pendente {
+  @apply bg-amber-100 text-amber-500;
+}
+.badge-confirmado {
+  @apply bg-green-100 text-green-800;
+}
+.badge-cancelado {
+  @apply bg-red-100 text-red-600;
+}
+
+/* Card surface */
+.card {
+  @apply rounded-lg border border-charcoal-200 bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)];
+}
+
+/* Tabular numerics */
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
