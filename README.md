@@ -1,336 +1,243 @@
-<img src="logo.png" alt="Mupi Systems Logo" width="200"/>
+# Vestaply
 
-# Estágio em Tecnologia - Desenvolvimento Full Stack
+> Marketplace B2B vertical para o atacado de moda brasileiro — focado em captação e qualificação de demandas de compra.
 
-## Sobre o teste
+![Vestaply](public/logo.png)
 
-Bem-vindo(a) ao teste técnico para a vaga de Estágio em Tecnologia - Desenvolvimento Full Stack na Mupi Systems!
+Esta implementação é o **módulo de entrada e gestão de demandas** do Vestaply. O marketplace completo (cadastros de compradores e fornecedores, feed, ofertas, match, pagamentos e chat) está fora do escopo deste teste e foi documentado como corte consciente em [`DECISOES.md`](./DECISOES.md). O brief original do desafio foi preservado em [`DESAFIO.md`](./DESAFIO.md).
 
-### O que você vai construir?
+---
 
-Um sistema web com três partes:
+## O que o Vestaply resolve
 
-1. **Uma página pública**: apresenta um negócio ou projeto de sua escolha e tem um formulário
-2. **Registros no banco**: o que chega pelo formulário é salvo com status "pendente"
-3. **Um painel de gestão**: onde o admin faz login e visualiza tudo que chegou
+O atacado de moda no Brasil é fragmentado: catálogos em PDF, conversas de WhatsApp, indicações informais. Compradores perdem tempo garimpando fornecedores e fornecedores perdem leads B2B qualificados. O Vestaply ataca esse gargalo com **demanda reversa**: o comprador descreve o que precisa, a equipe Vestaply qualifica e encaminha para fornecedores compatíveis.
 
-E sobre o quê? Isso é 100% seu. Agendamento numa barbearia, inscrição num curso, pedido de orçamento numa assistência técnica, reserva de mesa num restaurante, pedido de adoção numa ONG de animais... qualquer coisa em que alguém de fora envia uma solicitação e alguém de dentro gerencia o que chega.
+Esta entrega implementa o **mínimo viável para validar a entrada do funil**:
 
-Essa liberdade não é enfeite: criatividade é o nosso maior critério de avaliação. Tanto na forma de resolver o problema quanto nas escolhas que você faz pelo caminho.
+- Página pública apresentando o produto;
+- Formulário que persiste demandas com status `pendente`;
+- Geração de protocolo único por demanda;
+- Painel administrativo autenticado para gerenciar e qualificar as demandas.
 
-Ao longo deste documento vamos chamar essa solicitação de "registro". No seu projeto, dê a ela o nome do seu tema: agendamento, inscrição, pedido, reserva, o que for.
+---
 
-### Como funciona?
+## Escopo implementado
 
-**Visitante**: acessa a página pública, preenche o formulário e envia. O registro é salvo no banco como "pendente".
+| Área | Comportamento |
+|------|---------------|
+| Landing | Hero institucional, problema, como funciona em 3 etapas, benefícios, formulário e footer. |
+| Formulário | Validação de todos os campos com Zod no servidor, status sempre `pendente`, protocolo `VST-AAAA-XXXXXX`, confirmação visual com protocolo. |
+| Login | Credenciais com bcryptjs, sessão JWT, redirecionamento para `/admin` em sucesso. |
+| Painel `/admin` | Resumo operacional (totais, valor potencial), busca, filtros por status e categoria, listagem responsiva (tabela no desktop, cards no mobile), ordenação por data desejada de entrega. |
+| Detalhe `/admin/[id]` | Confirmação, cancelamento e reabertura como pendente; observação interna privada; valor potencial calculado. |
+| SEO/Identidade | Favicon (`favicon.ico`) e logo (`/public/logo.png`) servidos pelo Next, com tags `og:` e `twitter:card` configuradas. |
 
-**Administrador**: acessa a rota do painel, faz login e vê a lista de registros ordenada por data (nome, email, data, status...).
+---
 
-### O que esperamos?
+## Stack
 
-- Que funcione aquilo que você entregou
-- Código que você entende e consegue explicar
-- Decisões conscientes registradas, inclusive as decisões de não fazer algo
-- Pelo menos uma coisa que a gente não pediu (pode ser pequena!)
-- Interface com a cara do tema escolhido, responsiva e limpa
-- README que faz o projeto rodar sem você por perto
+- **Next.js 15** com App Router e Server Actions
+- **TypeScript** em modo `strict`
+- **Prisma 5** + **SQLite** local (arquivo `prisma/dev.db`, ignorado pelo Git)
+- **Auth.js (NextAuth v5)** com Credentials Provider e sessões JWT
+- **Zod** para validação de payloads no servidor
+- **bcryptjs** para hash de senha
+- **Tailwind CSS v3** com paleta institucional (verde profundo + marfim)
+- **next/font** com Fraunces (editorial) e Inter (sans-serif)
 
-### E antes de tudo: não precisa estar completo
+Tudo num único monólito Next.js, sem API REST separada, sem backend Express e sem microsserviços.
 
-Entrega parcial é entrega. Avaliamos o que você fez, não o tamanho do que faltou.
+---
 
-O que mais pesa aqui é como você pensa: como prioriza, o que percebe, como decide quando falta tempo ou informação. E isso aparece tão bem numa entrega parcial bem explicada quanto numa completa.
+## Pré-requisitos
 
-Se em algum momento a lista abaixo parecer grande demais, leia a seção [E se não der tempo de fazer tudo?](#e-se-não-der-tempo-de-fazer-tudo) antes de desistir.
+- **Node.js 20.x ou 22.x**
+- **npm 10+**
 
-## A stack é sua escolha
+---
 
-Não vamos dizer qual tecnologia usar. Você decide, e essa decisão faz parte da avaliação.
+## Instalação
 
-Laravel, Rails, Express, FastAPI, Next.js, Django, Spring, .NET, Go, Flask... tanto faz. Renderizado no servidor ou SPA, tanto faz. Postgres, MySQL, Mongo ou um SQLite num arquivo, tanto faz.
+```bash
+# 1. Instale as dependências
+npm install
 
-### Um conselho antes de escolher
+# 2. Copie o arquivo de exemplo de variáveis de ambiente
+cp .env.example .env
 
-Escolha o que você já conhece. Este não é um teste de aprender stack nova do zero. Escolher algo desconhecido só para impressionar costuma dar errado, e aparece na conversa. Ferramenta que você domina vale mais que ferramenta da moda.
+# 3. Gere um AUTH_SECRET novo (opcional mas recomendado)
+node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
+# Cole o resultado na variável AUTH_SECRET do .env
+```
 
-### O que a escolha precisa entregar
+A `DATABASE_URL` já aponta para `prisma/dev.db` (SQLite local). O arquivo de banco de dados **não é versionado**.
 
-Seja qual for a stack:
+> **Nota sobre o registro npm:** se a sua rede bloquear `registry.npmjs.org`, use o mirror `npm config set registry https://registry.npmmirror.com/`. O `package-lock.json` deste repositório foi gerado a partir desse mirror, mas o `package.json` permanece compatível com o registry oficial — basta restaurar o `registry` padrão após a instalação.
 
-- Roda na máquina de outra pessoa seguindo só o seu README
-- Autenticação pronta é permitida (Auth.js, Supabase, Devise, Passport, a do seu framework...). O que não vale é não saber explicar o que ela faz
-- O sistema é desenvolvido por você, não montado num serviço pronto (Calendly, Google Forms...)
-- Repositório com histórico de commits
+---
 
-No `DECISOES.md`, conte por que escolheu essa stack: o que você ganhou e o que perdeu com a escolha.
+## Migração e seed
 
-## Objetivos
+```bash
+# Cria o banco SQLite local e aplica todas as migrations
+npm run prisma:migrate -- --name init
 
-- Desenvolver uma página pública com formulário funcional
-- Visualizar os registros recebidos em um painel de gestão protegido por login
-- Demonstrar que você consegue ler uma especificação e traduzi-la em código
-- Mostrar capacidade de decidir sob ambiguidade e de organizar código
-- Criar uma interface responsiva e funcional
+# Cria o administrador de demonstração (idempotente)
+npm run seed
+```
 
-## Instruções
+O seed usa as credenciais definidas em `ADMIN_EMAIL` e `ADMIN_PASSWORD`. Para o avaliador, o `.env.example` traz um par já configurado:
 
-### Fork do repositório
+- E-mail: `admin@vestaply.local`
+- Senha: `vestaply-admin-2026`
 
-1. Faça um fork deste repositório para sua conta pessoal do GitHub
-2. Trabalhe no seu próprio fork
+> **Importante:** altere essas credenciais antes de qualquer deploy público.
 
-### Implementação
+---
 
-Desenvolva o projeto conforme os requisitos abaixo, no tema e na stack que você escolher.
+## Execução
 
-### Submissão
-
-1. Após finalizar, abra um Pull Request do seu fork para o repositório original
-2. Na descrição do PR, inclua:
-   - O que você adicionou além do que foi pedido, e por quê
-   - O que você decidiu não fazer, e por quê
-   - Onde você teve dificuldade
-3. Aguarde o agendamento da reunião para avaliação do teste
-
-### Documentação
-
-Dois arquivos no repositório:
-
-| Arquivo | Conteúdo |
-|---------|----------|
-| `README.md` | Descrição do projeto, stack utilizada e passo a passo para rodar |
-| `DECISOES.md` | Suas decisões (incluindo tema e stack) e como você usou IA |
-
-O `DECISOES.md` pode ser curto. Uma página inteira já é mais do que precisamos. Queremos clareza, não volume.
-
-## Requisitos funcionais
-
-Descritos por comportamento, não por tecnologia. Como implementar é com você.
-
-### Dados
-
-Um registro precisa guardar:
-
-| Campo | Observação |
-|-------|------------|
-| **nome** | Nome de quem preencheu o formulário |
-| **email** | Email de quem preencheu |
-| **tipo** | Valor restrito a uma lista de pelo menos 3 opções, definidas por você conforme o tema (serviços, turmas, tipos de pedido...) |
-| **data** | Uma data que faça sentido no seu tema: data do agendamento, do evento, da reserva, prazo desejado... |
-| **horário** | Se fizer sentido no tema. Um agendamento tem horário; um pedido de orçamento talvez não. Se não tiver, troque por outro campo que o seu tema pedir |
-| **status** | Restrito a: `pendente`, `confirmado`, `cancelado`. Nasce sempre como `pendente` |
-| **criado_em** | Quando o registro foi criado |
-
-Os nomes dos campos são seus: em português, em inglês, camelCase, o que a sua stack pedir. O que importa é a informação estar lá.
-
-### Comportamentos
-
-| # | O que precisa acontecer |
-|---|--------------------------|
-| 1 | Visitante acessa a página pública e vê informações do negócio/projeto e as opções oferecidas |
-| 2 | Visitante envia o formulário e o registro é persistido com status `pendente` |
-| 3 | Visitante recebe confirmação visual de que o envio deu certo |
-| 4 | Visitante que tenta acessar o painel sem estar autenticado é barrado e enviado para o login |
-| 5 | Admin faz login com credenciais válidas e chega no painel |
-| 6 | Painel lista todos os registros, ordenados por data, com o status de cada um visível |
-| 7 | Admin consegue encerrar a sessão (logout) |
-
-O item 4 é o que mais gente esquece de testar. Abra uma aba anônima e tente acessar o painel direto pela URL.
-
-### Interface
-
-- Design responsivo (mobile e desktop)
-- Status de cada registro visualmente identificável no painel (ex: badge colorida)
-
-#### Sobre CSS
-
-Use o que quiser: Tailwind (via CDN, uma linha no `<head>`), CSS puro, a biblioteca de componentes da sua stack, o que for. Só não gaste tempo configurando toolchain. Batalhar com build de CSS não é o que estamos avaliando, então escolha o caminho mais curto até o resultado visual.
-
-### Qualidade de código
-
-- Código organizado e legível
-- Estrutura de projeto coerente com as convenções da stack escolhida
-- README com instruções claras
-
-## O que a especificação não diz
-
-Esta especificação deixa espaço em aberto de propósito, e cada tema cria as próprias perguntas. Um exemplo que vale para qualquer tema: como fica o painel quando ainda não chegou nenhum registro? Outras vão aparecer conforme o que você escolher construir.
-
-Você não precisa resolver tudo que encontrar. Precisa perceber que existe e registrar o que decidiu. Duas ou três linhas por item, no `DECISOES.md`, já valem nota cheia.
-
-## Além do mínimo
-
-Os requisitos acima são o piso. Entregar tudo que foi pedido, bem feito, já é uma boa entrega. O que faz a gente lembrar de você é o que vem além. E "além" aqui é algo pequeno, não é outro projeto.
-
-### 1. Escolha 2 ou 3 melhorias e faça bem feito
-
-Três coisas caprichadas valem mais que dez pela metade. Lista longa com acabamento zero conta contra, não a favor.
-
-### 2. Adicione pelo menos uma coisa que não pedimos
-
-Você é o desenvolvedor do produto. Olhe para a tela de quem vai gerenciar isso e pergunte: o que falta aqui para ser realmente usável na segunda-feira de manhã?
-
-Pode ser simples. Implemente e explique no PR por que aquilo importa.
-
-### 3. Diga o que você decidiu não fazer
-
-Liste no PR o que ficou de fora de propósito e o motivo. Saber cortar escopo vale tanto quanto saber implementar.
-
-<details>
-<summary><b>Sem ideias do que fazer a mais? (abra só se precisar)</b></summary>
-
-Coisas que costumam fazer sentido nesse tipo de sistema. Não é um checklist: se você só executar essa lista, o resultado é o de todo mundo.
-
-- Visual atraente: cores e tipografia harmoniosas, com a "cara" do tema escolhido
-- Confirmar/cancelar registros: ações no painel para mudar o status
-- Validação de formulários, no frontend e no backend
-- Evitar conflitos: impedir dois registros no mesmo horário, na mesma vaga, o que valer no seu tema
-- Feedback visual: mensagem de sucesso após enviar e nas ações do painel
-- Interatividade sem recarregar a página, via a abordagem da sua stack
-- Filtros ou busca por status, data ou nome
-- Campos adicionais: telefone, observações, etc.
-- Paginação na listagem
-- Resumo no painel: contadores (total de pendentes, confirmados hoje...)
-
-</details>
-
-## Critérios de avaliação
-
-Vale repetir o que já dissemos lá em cima: o que mais avaliamos é criatividade. No tema, na solução, nos detalhes que você escolhe cuidar. Os critérios abaixo existem para dar chão a isso.
-
-### O básico: o que esperamos ver de pé
-
-- Formulário salva o registro no banco
-- Painel lista os registros ordenados por data, com o status visível
-- Login protege o painel
-- O projeto roda seguindo o seu próprio README, sem passo faltando
-
-Fechou esses quatro? Você fez o teste. O que vem abaixo é o que diferencia uma entrega da outra.
-
-Não fechou algum? Não é eliminatório. Conte no PR o que ficou faltando e por quê. O raciocínio conta.
-
-### Desempate: o que faz a gente lembrar de você
-
-| O que olhamos | Como aparece na prática |
-|---------------|--------------------------|
-| Criatividade | O tema, a solução e os detalhes têm a sua cara, não a cara de um tutorial |
-| Julgamento | Percebeu as ambiguidades da especificação e decidiu conscientemente |
-| Escolha de ferramenta | A stack faz sentido para o problema e você sabe dizer por que escolheu |
-| Iniciativa | Adicionou algo que não pedimos e soube dizer por que importa |
-| Priorização | Cortou escopo de propósito e explicou o corte |
-| Domínio | Entende o que entregou e consegue conversar sobre o próprio código |
-| Cuidado | Página com a cara do tema, estados vazios tratados, responsivo testado no celular |
-| Comunicação | README claro, PR bem escrito, commits que contam a história do trabalho |
-
-Não avaliamos qual tema nem qual stack você escolheu. Avaliamos se as escolhas foram conscientes e se você domina o que escolheu.
-
-## Diretrizes criativas
-
-### Página pública
-
-Liberdade criativa total: escolha qualquer tema em que uma pessoa envia uma solicitação e um admin gerencia, real ou fictício.
-
-Alguns exemplos, só para destravar:
-
-- Barbearia ou salão: agendamento de horário
-- Clínica (médica, odontológica, fisioterapia...): agendamento de consulta
-- Curso, workshop ou aula experimental: inscrição
-- Assistência técnica ou marcenaria: pedido de orçamento
-- Restaurante ou espaço de eventos: reserva
-- ONG de animais: pedido de adoção
-- Estúdio fotográfico: agendamento de ensaio
-- Ou qualquer outra combinação que você inventar
-
-A estrutura da página é livre. Poucas seções bem feitas valem mais que muitas espremidas, e não precisa ser uma landing page de agência.
-
-### Painel de gestão
-
-Um painel próprio para visualizar os registros, com acesso controlado por autenticação.
-
-#### O fluxo que precisa funcionar
-
-1. Visitante acessa a rota do painel
-2. Como não está autenticado, é redirecionado para a tela de login
-3. Admin faz login com credenciais válidas
-4. É levado ao painel
-5. Vê todos os registros, ordenados por data
-6. Consegue sair da sessão quando quiser
-
-#### O que você precisa montar
-
-| Peça | O que faz |
-|------|-----------|
-| Usuário admin | Um usuário com acesso ao painel. Documente no README como criá-lo |
-| Tela de login | Formulário de autenticação. Pode ser simples, não avaliamos o design dela |
-| Proteção da rota | Sem sessão válida, o painel não abre. Nem pela URL direta |
-| Logout | Um jeito de encerrar a sessão |
-| Listagem | Os campos do registro, com status visível, ordenados por data. Aqui vale caprichar |
-
-Use a autenticação pronta da sua stack. Reinventar login do zero não impressiona ninguém. O que queremos ver é você sabendo usar e explicar a que já existe.
-
-## Rodando o projeto
-
-Como o seu projeto sobe depende da stack que você escolheu, então quem escreve essa parte é você, no README do seu repositório.
-
-O critério é simples, e a gente vai testar de verdade: uma pessoa que nunca viu seu projeto consegue clonar, seguir o seu README e ver a aplicação funcionando no navegador?
-
-Na prática, isso costuma significar cobrir:
-
-- Pré-requisitos (versão de linguagem, runtime, banco de dados...)
-- Instalação das dependências
-- Variáveis de ambiente, se houver (inclua um `.env.example`)
-- Preparo do banco (migrations, seed...)
-- Como criar o usuário admin
-- Como subir a aplicação e em qual endereço ela responde
-
-O passo do usuário admin é o que mais falta nas entregas. Se a gente não conseguir entrar no painel, metade do teste fica invisível. Vale testar seu próprio README numa pasta limpa antes de enviar.
-
-## Notas importantes
-
-- Funcionar é pré-requisito. O diferencial é o cuidado e as decisões
-- Se a lista parecer grande, corte, e conte no PR o que cortou e por quê
-- Queremos ver o processo: commits incrementais com mensagens que fazem sentido valem mais que um único commit "projeto final"
-- Documentação, Stack Overflow, IA: tudo liberado. Veja a seção sobre IA abaixo
-- Simples e bem feito é melhor que complexo e quebrado
-
-## E se não der tempo de fazer tudo?
-
-Está tudo bem. Sério.
-
-Entregue do jeito que estiver e conte no Pull Request:
-
-- O que você conseguiu fazer
-- Onde travou, e o que tentou antes de travar
-- O que faria diferente com mais tempo
-
-Avaliamos o que você fez, não o tamanho do que faltou. Um projeto com metade dos requisitos e um raciocínio claro por trás das escolhas vale mais, para nós, do que um projeto completo que o candidato não sabe explicar.
-
-E vale repetir, porque é o que mais importa: o que estamos avaliando é a forma como você pensa. Como você prioriza, o que percebe, como decide quando falta tempo ou informação. Isso aparece igualmente bem numa entrega parcial. Às vezes até melhor, porque é justamente ao priorizar que a cabeça de alguém fica visível.
-
-O único cenário ruim é não entregar. Se você chegou até aqui, abra o PR. 😊
-
-## Sobre o uso de IA
-
-Assumimos que você vai usar IA. Nós usamos. Não tem problema nenhum nisso.
-
-Mas isso muda o que estamos avaliando. Se a IA escreve o CRUD em 20 minutos, o CRUD não diz nada sobre você. O que diz é o que você faz depois: o que percebeu que faltava, o que recusou da sugestão dela, e o que decidiu por conta própria.
-
-### No seu `DECISOES.md`
-
-Além das decisões técnicas, inclua uma seção curta sobre IA respondendo:
-
-1. O que você delegou para a IA e o que fez à mão, e por quê
-2. Uma vez em que a IA te deu algo ruim ou errado: o que era, como você percebeu, e o que fez no lugar
-3. Uma decisão que você tomou contra a sugestão da IA, e o motivo
-
-A pergunta 2 é a que mais nos interessa. Quem usa IA de verdade sempre tem essa história. Quem só copia e cola, não tem.
-
-Três parágrafos curtos resolvem. Não precisa de mais que isso.
-
-### E depois, na conversa
-
-Vamos conversar sobre o que você construiu: por que fez de um jeito e não de outro, o que te deu trabalho, o que você mudaria. Não é sabatina. É a mesma conversa que temos entre a gente quando alguém abre um PR.
-
-Por isso vale entregar código que você entende. Não porque vamos cobrar linha por linha, mas porque essa conversa é a parte mais interessante do processo, e é onde você tem mais espaço para mostrar como pensa.
-
-Boa sorte! A gente se vê na conversa.
+```bash
+# Modo desenvolvimento
+npm run dev
+# Acesse http://localhost:3000
+
+# Build de produção + start
+npm run build
+npm start
+```
+
+Rotas principais:
+
+- `GET /` — landing pública com formulário de demanda
+- `GET /login` — login administrativo
+- `GET /admin` — painel (protegido, redireciona para `/login` se não autenticado)
+- `GET /admin/:id` — detalhe de uma demanda
+
+---
+
+## Scripts npm
+
+| Script | O que faz |
+|--------|-----------|
+| `npm run dev` | Sobe o Next.js em modo dev. |
+| `npm run build` | Gera o Prisma Client e faz o build de produção. |
+| `npm start` | Inicia o servidor de produção. |
+| `npm run lint` | Roda o ESLint com `next/core-web-vitals`. |
+| `npm run prisma:generate` | Regenera o Prisma Client. |
+| `npm run prisma:migrate` | Aplica migrações em ambiente dev. |
+| `npm run prisma:deploy` | Aplica migrações em produção. |
+| `npm run seed` | Semeia (ou atualiza) o admin do `.env`. |
+
+---
+
+## Como testar a proteção de `/admin`
+
+1. Abra uma aba anônima e acesse `http://localhost:3000/admin`.
+2. Você será redirecionado para `/login?callbackUrl=/admin`.
+3. Faça login com `admin@vestaply.local` / `vestaply-admin-2026`.
+4. Você retornará ao `/admin` autenticado.
+5. Clique em **Sair** para encerrar a sessão — o cookie JWT é destruído e `/admin` passa a redirecionar novamente.
+
+A verificação acontece em três camadas: **middleware** (edge), **layout** do `/admin` e **dentro de cada Server Action administrativa** (defesa em profundidade).
+
+---
+
+## Funcionalidades
+
+- [x] Página pública com seções: header, hero, problema, como funciona, benefícios, formulário, footer.
+- [x] Formulário com validação no servidor (Zod) e no cliente.
+- [x] Persistência com status `pendente` forçado pelo servidor.
+- [x] Geração de protocolo `VST-AAAA-XXXXXX` único.
+- [x] Confirmação visual com protocolo.
+- [x] Login com credenciais (bcryptjs + JWT).
+- [x] Painel com resumo operacional (totais, valor potencial).
+- [x] Busca textual e filtros por status e categoria.
+- [x] Listagem responsiva (tabela no desktop, cards no mobile).
+- [x] Ordenação por data desejada de entrega.
+- [x] Confirmação e cancelamento de demanda com Server Actions.
+- [x] Reabrir demanda como pendente.
+- [x] Observação interna privada (somente equipe Vestaply).
+- [x] Cálculo de valor potencial (`quantidade × preço-alvo`).
+- [x] Logout funcional.
+- [x] Estado vazio no painel quando não há demandas.
+- [x] Estados de loading com skeleton.
+- [x] Acessibilidade básica: foco visível, labels associados, mensagens de erro com `role="alert"`, pular para o conteúdo.
+- [x] Favicon e Open Graph configurados.
+
+---
+
+## Limitações conhecidas
+
+- **Sem upload de arquivos** — o brief original do desafio não exige. Anotações ficam em texto puro.
+- **Sem confirmação de leitura** — não enviamos e-mail; o comprador recebe o protocolo na tela.
+- **Sem paginação** — listagem fixa com até 50 demandas filtradas. Para volumes maiores, a próxima iteração deveria paginar.
+- **SQLite local** — adequado para a avaliação, mas não para múltiplas réplicas em produção.
+- **Sem 2FA, troca de senha ou recuperação** — fora do escopo.
+- **Sem API REST** — toda mutação passa por Server Actions.
+
+Itens fora do escopo do Vestaply completo (marketplace com fornecedores, ofertas, match, pagamentos, chat) estão documentados em [`DECISOES.md`](./DECISOES.md).
+
+---
+
+## Estrutura do projeto
+
+```
+.
+├── prisma/
+│   ├── schema.prisma          # Modelos Admin e Demand
+│   ├── seed.ts                # Seed idempotente do administrador
+│   └── migrations/            # Versionadas, geradas por prisma migrate
+├── public/
+│   ├── favicon.ico            # Ícone multi-tamanho (16/32/48)
+│   └── logo.png               # Logo principal (1920x1080)
+├── scripts/
+│   ├── seed-demo.ts           # 3 demandas de demonstração
+│   ├── test-action.ts         # Smoke test de update/cancel/notas
+│   ├── test-form-validation.ts# Smoke test do schema Zod e parseBrlToCents
+│   └── list-ids.ts            # Lista IDs+protocolos+status das demandas
+├── src/
+│   ├── app/
+│   │   ├── actions/           # Server Actions: submit-demand, admin
+│   │   ├── admin/             # Painel protegido
+│   │   │   ├── _components/   # Summary, filtros, tabela, status, notas
+│   │   │   ├── [id]/          # Detalhe da demanda
+│   │   │   ├── layout.tsx     # Re-checagem de sessão + header
+│   │   │   ├── loading.tsx    # Skeleton
+│   │   │   └── page.tsx       # Listagem
+│   │   ├── api/auth/[...nextauth]/route.ts  # Handlers do NextAuth
+│   │   ├── login/             # Tela de login
+│   │   ├── globals.css        # Tokens visuais + componentes utilitários
+│   │   ├── layout.tsx         # Layout raiz com fontes, favicon e a11y
+│   │   └── page.tsx           # Landing pública
+│   ├── components/            # Logo, badges, inputs, currency
+│   ├── lib/
+│   │   ├── auth.config.ts     # NextAuth Edge-safe (sem bcrypt)
+│   │   ├── auth.ts            # NextAuth config completa
+│   │   ├── constants.ts       # Status e categorias canônicos
+│   │   ├── format.ts          # Formatadores pt-BR + BRL cents
+│   │   ├── prisma.ts          # Singleton do PrismaClient
+│   │   ├── protocol.ts        # Gerador de protocolo
+│   │   ├── queries.ts         # Consultas do painel
+│   │   └── validators.ts      # Schemas Zod compartilhados
+│   └── middleware.ts          # Proteção de /admin via edge middleware
+├── DESAFIO.md                 # Brief original preservado
+├── DECISOES.md                # Decisões de stack, escopo e IA
+├── README.md                  # Este arquivo
+├── implementation_plan.md     # Plano de execução
+├── task.md                    # Checklist de tarefas
+├── next.config.mjs
+├── tailwind.config.ts
+├── tsconfig.json
+└── package.json
+```
+
+---
+
+## Referências
+
+- [`DESAFIO.md`](./DESAFIO.md) — brief original do desafio técnico.
+- [`DECISOES.md`](./DECISOES.md) — decisões de stack, escopo e uso de IA.
+- `PLANO DE NEGÓCIO - VESTAPLY.md` — plano de negócio original (tema do projeto).
+- `vestaply-guia.md` — guia de produto do Vestaply.
+- `vestaply-dashboard-ux-spec.md` — spec de UX do dashboard completo (fora do escopo deste teste).
