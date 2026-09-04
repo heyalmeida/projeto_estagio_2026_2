@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { getDemandById } from "@/lib/queries";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Currency } from "@/components/Currency";
-import { formatDate, formatDateTime, formatNumber } from "@/lib/format";
+import { formatDateOnly, formatDateTime, formatNumber } from "@/lib/format";
 import type { DemandStatus } from "@/lib/constants";
 import { StatusActions } from "../_components/StatusActions";
 import { InternalNotesForm } from "../_components/InternalNotesForm";
@@ -69,7 +69,7 @@ export default async function DemandDetailPage({ params }: PageProps) {
                   Data desejada
                 </dt>
                 <dd className="mt-1 text-charcoal-900">
-                  {formatDate(demand.deliveryDate)}
+                  {formatDateOnly(demand.deliveryDate)}
                 </dd>
               </div>
               <div>

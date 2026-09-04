@@ -56,7 +56,6 @@ export async function submitDemand(
     ? data.targetUnitPrice.cents
     : null;
 
-  // Retry once on protocol collision (the random part is 24 bits).
   for (let attempt = 0; attempt < 3; attempt += 1) {
     const protocol = generateProtocol();
     try {
@@ -80,7 +79,6 @@ export async function submitDemand(
 
       return { ok: true, protocol };
     } catch (error) {
-      // Unique constraint violation on protocol — retry.
       if (
         error instanceof Error &&
         error.message.includes("Unique constraint failed") &&

@@ -18,15 +18,18 @@ export function DemandForm() {
     event.preventDefault();
     if (isPending) return;
 
-    const formData = new FormData(event.currentTarget);
+    // Capture the form reference *before* the async boundary.
+    // event.currentTarget becomes null after the function yields, so we
+    // must not access it after any await.
+    const form = event.currentTarget as HTMLFormElement;
+    const formData = new FormData(form);
     startTransition(async () => {
       const response = await submitDemand(null, formData);
       setResult(response);
 
       if (response.ok) {
         setFieldErrors({});
-        // Reset the native form (after the success state renders).
-        event.currentTarget.reset();
+        form.reset();
         return;
       }
       setFieldErrors(response.fieldErrors ?? {});

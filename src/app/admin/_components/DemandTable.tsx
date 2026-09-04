@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Currency } from "@/components/Currency";
-import { formatDate, formatNumber } from "@/lib/format";
+import { formatDateOnly, formatNumber } from "@/lib/format";
 import { DEFAULT_DEMAND_STATUS } from "@/lib/constants";
 import type { DemandStatus } from "@/lib/constants";
 
@@ -61,7 +61,7 @@ export function DemandTable({ demands }: { demands: Row[] }) {
                       {formatNumber(demand.quantity)}
                     </td>
                     <td className="px-4 py-3 text-charcoal-700">
-                      {formatDate(demand.deliveryDate)}
+                      {formatDateOnly(demand.deliveryDate)}
                     </td>
                     <td className="px-4 py-3 text-right">
                       <Currency cents={demand.targetUnitPriceCents} />
@@ -123,7 +123,7 @@ export function DemandTable({ demands }: { demands: Row[] }) {
                 <div>
                   <dt className="text-xs text-charcoal-500">Prazo</dt>
                   <dd className="text-charcoal-900">
-                    {formatDate(demand.deliveryDate)}
+                    {formatDateOnly(demand.deliveryDate)}
                   </dd>
                 </div>
                 <div>
