@@ -12,18 +12,6 @@ import { PT_BR_TIMEZONE, toLocalIsoDate } from "./date";
 
 export { PT_BR_TIMEZONE };
 
-export function formatDate(value: Date | string | null | undefined): string {
-  if (!value) return "—";
-  const date = value instanceof Date ? value : new Date(value);
-  if (Number.isNaN(date.getTime())) return "—";
-  return new Intl.DateTimeFormat("pt-BR", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    timeZone: PT_BR_TIMEZONE,
-  }).format(date);
-}
-
 export function formatDateOnly(value: Date | string | null | undefined): string {
   if (!value) return "—";
   const iso = toLocalIsoDate(value);

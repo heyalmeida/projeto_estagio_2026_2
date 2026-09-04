@@ -40,6 +40,10 @@ export function todayInSaoPaulo(now: Date = new Date()): string {
  * Parse a civil date string ("YYYY-MM-DD") into a Date anchored at
  * 12:00 UTC. The noon offset ensures the local day stays the same in
  * every timezone west of UTC-12 and east of UTC+12.
+ *
+ * Unlike `new Date("2027-02-30")` which normalises to March, we
+ * validate that the UTC components of the constructed date match the
+ * input.  This rejects non-existent dates like 2027-02-29 or 2027-04-31.
  */
 export function parseCivilDate(value: string): Date | null {
   const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
@@ -59,19 +63,19 @@ export function parseCivilDate(value: string): Date | null {
   ) {
     return null;
   }
-  // 31-day month check is delegated to Date; invalid combinations
-  // like 2026-02-30 will produce NaN at construction.
   const utc = new Date(Date.UTC(year, month - 1, day, 12, 0, 0, 0));
   if (Number.isNaN(utc.getTime())) return null;
+
+  // Guard against date normalisation: 2027-02-30 becomes 2027-03-02.
+  // Comparing the parsed components catches this.
+  if (
+    utc.getUTCFullYear() !== year ||
+    utc.getUTCMonth() !== month - 1 ||
+    utc.getUTCDate() !== day
+  ) {
+    return null;
+  }
+
   return utc;
 }
 
-/** True if `a` is strictly before `b` (civil-date comparison). */
-export function isBeforeCivil(a: Date, b: Date): boolean {
-  return toLocalIsoDate(a) < toLocalIsoDate(b);
-}
-
-/** True if `a` is the same civil day as `b` (in São Paulo). */
-export function isSameCivilDay(a: Date, b: Date): boolean {
-  return toLocalIsoDate(a) === toLocalIsoDate(b);
-}

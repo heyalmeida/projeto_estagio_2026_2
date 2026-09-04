@@ -1,13 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import {
-  updateDemandStatus,
-  confirmDemandAction,
-  cancelDemandAction,
-  setDemandStatus,
-  type AdminActionResult,
-} from "@/app/actions/admin";
+import { updateDemandStatus, type AdminActionResult } from "@/app/actions/admin";
 import type { DemandStatus } from "@/lib/constants";
 
 interface StatusActionsProps {
@@ -73,16 +67,6 @@ export function StatusActions({ demandId, currentStatus }: StatusActionsProps) {
           Reabrir como pendente
         </button>
       </div>
-      {/* Progressive-enhancement fallbacks — kept for non-JS environments */}
-      <form action={confirmDemandAction} className="hidden">
-        <input type="hidden" name="id" value={demandId} />
-      </form>
-      <form action={cancelDemandAction} className="hidden">
-        <input type="hidden" name="id" value={demandId} />
-      </form>
-      <form action={setDemandStatus} className="hidden">
-        <input type="hidden" name="id" value={demandId} />
-      </form>
     </div>
   );
 }

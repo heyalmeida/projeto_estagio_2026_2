@@ -16,7 +16,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
     callbackUrl && callbackUrl.startsWith("/") ? callbackUrl : "/admin";
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-ivory-50 px-4 py-12">
+    <main id="conteudo" className="flex min-h-screen items-center justify-center bg-ivory-50 px-4 py-12">
       <div className="w-full max-w-md">
         <div className="mb-8 flex justify-center">
           <Link href="/" aria-label="Vestaply — voltar para a página inicial">
@@ -38,6 +38,6 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
           </Link>
         </p>
       </div>
-    </div>
+    </main>
   );
 }

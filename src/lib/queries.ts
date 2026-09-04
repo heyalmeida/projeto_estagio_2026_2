@@ -8,14 +8,12 @@ export interface DemandListFilters {
   category?: string | "todas";
 }
 
-const PAGE_SIZE = 50;
-
 /**
  * List demands for the admin panel. Sorted by:
  *   1. desired delivery date ascending (closer first)
  *   2. creation date descending as tie-breaker
  *
- * No pagination yet — the brief asks for a single, scannable table.
+ * No pagination — returns all matching records.
  * Filters: search (company/buyer/protocol), status, category.
  */
 export async function listDemands(filters: DemandListFilters = {}) {
@@ -42,7 +40,6 @@ export async function listDemands(filters: DemandListFilters = {}) {
   return prisma.demand.findMany({
     where,
     orderBy: [{ deliveryDate: "asc" }, { createdAt: "desc" }],
-    take: PAGE_SIZE,
   });
 }
 

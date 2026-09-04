@@ -1,6 +1,6 @@
 // Vestaply — Prisma schema
 // Local SQLite for evaluation. Models kept minimal per the test brief:
-// only `Admin` and `Demand` are required by prompt.md.
+// only `Admin` and `Demand` are required by DESAFIO.md.
 
 generator client {
   provider = "prisma-client-js"

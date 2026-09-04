@@ -3,10 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import {
-  internalNotesSchema,
-  statusUpdateSchema,
-} from "@/lib/validators";
+import { internalNotesSchema, statusUpdateSchema } from "@/lib/validators";
 import type { DemandStatus } from "@/lib/constants";
 
 export type AdminActionResult =
@@ -27,8 +24,8 @@ async function requireAdmin(): Promise<AdminActionResult | null> {
 }
 
 /**
- * Status mutation used by the client component. Returns a typed result
- * so the UI can render success/error messages without a page reload.
+ * Update the status of a demand. Returns a typed result so the UI can
+ * render success/error messages without a page reload.
  */
 export async function updateDemandStatus(
   _prev: unknown,
@@ -66,33 +63,8 @@ export async function updateDemandStatus(
 }
 
 /**
- * Server-action wrapper used by the progressive-enhancement <form>
- * fallback in the detail page. Must return void for the type system.
+ * Save or clear the internal notes on a demand.
  */
-export async function setDemandStatus(
-  formData: FormData,
-): Promise<void> {
-  await updateDemandStatus(null, formData);
-}
-
-export async function confirmDemandAction(
-  formData: FormData,
-): Promise<void> {
-  const next = new FormData();
-  for (const [k, v] of formData.entries()) next.append(k, v);
-  next.set("status", "confirmado");
-  await updateDemandStatus(null, next);
-}
-
-export async function cancelDemandAction(
-  formData: FormData,
-): Promise<void> {
-  const next = new FormData();
-  for (const [k, v] of formData.entries()) next.append(k, v);
-  next.set("status", "cancelado");
-  await updateDemandStatus(null, next);
-}
-
 export async function updateInternalNotes(
   _prev: unknown,
   formData: FormData,

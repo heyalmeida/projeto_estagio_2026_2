@@ -23,7 +23,7 @@ export default async function AdminLayout({
         adminName={session.user.name ?? null}
         adminEmail={session.user.email ?? null}
       />
-      <main className="mx-auto max-w-content px-4 py-8 sm:px-6 lg:px-8">
+      <main id="conteudo" className="mx-auto max-w-content px-4 py-8 sm:px-6 lg:px-8">
         {children}
       </main>
     </div>

@@ -55,8 +55,8 @@ Esta entrega implementa o **mínimo viável para validar a entrada do funil**:
 ## Instalação
 
 ```bash
-# 1. Instale as dependências
-npm install
+# 1. Instale as dependências a partir do lockfile
+npm ci
 
 # 2. Copie o arquivo de exemplo de variáveis de ambiente
 cp .env.example .env
@@ -67,8 +67,6 @@ node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
 ```
 
 A `DATABASE_URL` já aponta para `prisma/dev.db` (SQLite local). O arquivo de banco de dados **não é versionado**.
-
-> **Nota sobre o registro npm:** se a sua rede bloquear `registry.npmjs.org`, use o mirror: `npm config set registry https://registry.npmmirror.com/`. Depois da instalação, restaure o registry: `npm config set registry https://registry.npmjs.org/`.
 
 ---
 
@@ -124,6 +122,7 @@ Rotas principais:
 | `npm run prisma:migrate` | Aplica migrações em ambiente dev. |
 | `npm run prisma:deploy` | Aplica migrações em produção. |
 | `npm run seed` | Semeia (ou atualiza) o admin do `.env`. |
+| `npm run test:validation` | Executa os testes de validação (schema Zod, parser monetário, datas civis). |
 
 ---
 
@@ -211,7 +210,6 @@ A verificação acontece em três camadas: **middleware** (edge), **layout** do 
 ├── DESAFIO.md                 # Brief original preservado
 ├── DECISOES.md                # Decisões de stack, escopo e IA
 ├── README.md                  # Este arquivo
-├── prompt.md                  # Brief do desafio (para o avaliador)
 ├── next.config.mjs
 ├── tailwind.config.ts
 ├── tsconfig.json
@@ -224,4 +222,3 @@ A verificação acontece em três camadas: **middleware** (edge), **layout** do 
 
 - [`DESAFIO.md`](./DESAFIO.md) — brief original do desafio técnico.
 - [`DECISOES.md`](./DECISOES.md) — decisões de stack, escopo e uso de IA.
-- `prompt.md` — brief do desafio (anexado pelo avaliador).
