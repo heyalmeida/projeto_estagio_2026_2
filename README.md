@@ -238,6 +238,3 @@ Itens fora do escopo do Vestaply completo (marketplace com fornecedores, ofertas
 
 - [`DESAFIO.md`](./DESAFIO.md) — brief original do desafio técnico.
 - [`DECISOES.md`](./DECISOES.md) — decisões de stack, escopo e uso de IA.
-- `PLANO DE NEGÓCIO - VESTAPLY.md` — plano de negócio original (tema do projeto).
-- `vestaply-guia.md` — guia de produto do Vestaply.
-- `vestaply-dashboard-ux-spec.md` — spec de UX do dashboard completo (fora do escopo deste teste).
